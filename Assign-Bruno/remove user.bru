@@ -1,0 +1,18 @@
+meta {
+  name: remove user
+  type: http
+  seq: 4
+}
+
+delete {
+  url: http://localhost:8000/api/v1/users/65570202
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "xxxx",
+    "lastname": "xxxxxpas"
+  }
+}
