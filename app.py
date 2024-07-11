@@ -6,12 +6,11 @@ import models
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
-
-
 from database import SessionLocal, engine
 from pydantic import BaseModel
-from typing import Annotated, Union, NewType
+from typing import Annotated
 
+import os
 
 # For Validation
 
@@ -138,4 +137,4 @@ app.include_router(router_v1)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app)
+    uvicorn.run(app,host=os.environ.get("HOST","127.0.0.1"))
