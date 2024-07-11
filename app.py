@@ -92,7 +92,7 @@ async def update_user(stu_id: int,response: Response , user: Annotated[UserModel
         newUser = models.User(
             stu_id=user.stu_id,
             name=user.name, lastname=user.lastname, bod=user.bod, gender=user.gender)
-        db.query(models.User).filter(models.User.stu_id == stu_id).update(
+        infected = db.query(models.User).filter(models.User.stu_id == stu_id).update(
             {
                 models.User.stu_id: newUser.stu_id,
                 models.User.name: newUser.name,
@@ -104,16 +104,21 @@ async def update_user(stu_id: int,response: Response , user: Annotated[UserModel
         )
 
         db.commit()
-        db.refresh(newUser)
+        if(infected == 0):
+            response.status_code = 404
+            return {
+                "messgage":"May not found stu_id"
+            }
+        response.status_code = 201
         return {
             "messgage": "update success",
-            "new":newUser
+            "new":newUser,
         }
     except:
         db.rollback()
         response.status_code = 500
         return {
-        "messgage": "update success",
+        "messgage": "update fail",
              "help":"pls check date string is correct or stu_id have already been in database"
         }
 
@@ -121,8 +126,13 @@ async def update_user(stu_id: int,response: Response , user: Annotated[UserModel
 @router_v1.delete('/users/{stu_id}')
 async def delete_user(stu_id: int , response: Response , db: Session = Depends(get_db)):
     try:
-        db.query(models.User).filter(models.User.stu_id ==stu_id).delete()
+        infected = db.query(models.User).filter(models.User.stu_id ==stu_id).delete()
         db.commit()
+        if(infected == 0):
+            response.status_code = 404
+            return {
+                "messgage":"May not found stu_id"
+            }
         return {
             "messgage": "delete success"
         }
@@ -130,7 +140,7 @@ async def delete_user(stu_id: int , response: Response , db: Session = Depends(g
         db.rollback()
         response.status_code = 500
         return {
-        "messgage": "update success",
+        "messgage": "delete fail",
         "help":"pls stu_id is have been in database"
     }
 app.include_router(router_v1)

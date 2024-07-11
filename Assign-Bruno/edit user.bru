@@ -5,7 +5,17 @@ meta {
 }
 
 patch {
-  url: 
-  body: none
+  url: http://localhost:8000/api/v1/users/990700002
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "stu_id": 99070000,
+    "name": "xxx",
+    "lastname": "xxx",
+    "bod": "10/10/2000",
+    "gender": "xxx"
+  }
 }
