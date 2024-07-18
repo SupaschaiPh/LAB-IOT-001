@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Annotated
 
 import os
@@ -39,10 +39,20 @@ class UserModelDTO(BaseModel):
     bod: str
     gender: str
 
-class MenuSchema(BaseModel):
+class MenuDTO(BaseModel):
     name: str 
-    description: str 
+    description: str  = ""
     price: float 
+
+class BookDTO(BaseModel):
+    title: str
+    description: str = ""
+    author: str
+    year: int = 2024
+    is_published: bool = True
+    cover_url: str = ""
+    category: str = ""
+    synopsis: str = ""
 
 #class EditUserModelDTO(BaseModel):
 #    stu_id: int | None
@@ -77,9 +87,9 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
     return db.query(models.Book).filter(models.Book.id == book_id).first()
 
 @router_v1.post('/books')
-async def create_book(book: dict, response: Response , db: Session = Depends(get_db)):
+async def create_book(book:Annotated[BookDTO,Body()], response: Response , db: Session = Depends(get_db)):
     # TODO: Add validation
-    newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'],description=book['description'],category=book['category'],synopsis=book['synopsis'])
+    newbook = models.Book(title=book.title, author=book.author, year=book.year, is_published=book.is_published,description=book.description,category=book.category,synopsis=book.synopsis)
     db.add(newbook)
     db.commit()
     db.refresh(newbook)
@@ -87,7 +97,7 @@ async def create_book(book: dict, response: Response , db: Session = Depends(get
     return newbook
 
 @router_v1.patch('/books/{book_id}')
-async def update_book(book_id: int, book: dict ,response: Response , db: Session = Depends(get_db)):
+async def update_book(book_id: int, book: Annotated[BookDTO,Body()] ,response: Response , db: Session = Depends(get_db)):
     existing_book = db.query(models.Book).filter(models.Book.id == book_id).first()
     if not existing_book:
         response.status_code = 404
@@ -146,31 +156,18 @@ async def create_user(user: Annotated[UserModelDTO, Body()], response: Response,
 @router_v1.patch('/users/{stu_id}')
 async def update_user(stu_id: int,response: Response , user: Annotated[UserModelDTO, Body()], db: Session = Depends(get_db)):
     try:
-        newUser = models.User(
-            stu_id=user.stu_id,
-            name=user.name, lastname=user.lastname, bod=user.bod, gender=user.gender)
-        infected = db.query(models.User).filter(models.User.stu_id == stu_id).update(
-            {
-                models.User.stu_id: newUser.stu_id,
-                models.User.name: newUser.name,
-                models.User.lastname: newUser.lastname,
-                models.User.bod: newUser.bod,
-                models.User.gender: newUser.gender,
-
-            }
-        )
-
-        db.commit()
-        if(infected == 0):
+        #existing_user = models.User(
+        #    stu_id=user.stu_id,
+        #    name=user.name, lastname=user.lastname, bod=user.bod, gender=user.gender)
+        existing_user = db.query(models.User).filter(models.User.stu_id == stu_id).first()
+        if not existing_user:
             response.status_code = 404
-            return {
-                "messgage":"May not found stu_id"
-            }
-        response.status_code = 201
-        return {
-            "messgage": "update success",
-            "new":newUser,
-        }
+            return {"message": "Book not found"}
+        for key, value in user.items():
+            setattr(existing_user, key, value)
+        db.commit()
+        db.refresh(existing_user)
+        return existing_user
     except:
         db.rollback()
         response.status_code = 500
@@ -217,7 +214,7 @@ async def get_menu(menu_id: int , response: Response, db: Session = Depends(get_
         return {"message": "Menu not found"}
     return menu
 @router_v1.post('/menus')
-async def create_menu(menu: MenuSchema, db: Session = Depends(get_db)):
+async def create_menu(menu: MenuDTO, db: Session = Depends(get_db)):
     new_menu = models.Menu(
         name=menu.name,
         description=menu.description,
