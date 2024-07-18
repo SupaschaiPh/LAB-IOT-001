@@ -56,6 +56,49 @@ app.add_middleware(
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#crud-utils
 
 
+@router_v1.get('/books')
+async def get_books(db: Session = Depends(get_db)):
+    return db.query(models.Book).all()
+
+@router_v1.get('/books/{book_id}')
+async def get_book(book_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Book).filter(models.Book.id == book_id).first()
+
+@router_v1.post('/books')
+async def create_book(book: dict, response: Response, db: Session = Depends(get_db)):
+    # TODO: Add validation
+    newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'])
+    db.add(newbook)
+    db.commit()
+    db.refresh(newbook)
+    response.status_code = 201
+    return newbook
+
+@router_v1.patch('/books/{book_id}')
+async def update_book(book_id: int, book: dict ,response: Response , db: Session = Depends(get_db)):
+    existing_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not existing_book:
+        response.status_code = 404
+        return {"message": "Book not found"}
+
+    for key, value in book.items():
+        setattr(existing_book, key, value)
+
+    db.commit()
+    db.refresh(existing_book)
+    return existing_book
+
+@router_v1.delete('/books/{book_id}')
+async def delete_book(book_id: int,response: Response, db: Session = Depends(get_db)):
+    book_to_delete = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if not book_to_delete:
+        response.status_code = 404
+        return {"message": "Book not found"}
+
+    db.delete(book_to_delete)
+    db.commit()
+    return {"detail": "Book deleted successfully"}
+
 @router_v1.get('/users')
 async def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()

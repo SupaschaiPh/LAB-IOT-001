@@ -1,4 +1,4 @@
-from sqlalchemy import  Column, Integer, String ,Date
+from sqlalchemy import  Column, Integer, String ,Date,Boolean
 # from sqlalchemy.orm import relationship
 
 from database import Base
@@ -11,3 +11,13 @@ class User(Base):
     lastname = Column(String)
     bod = Column(Date)
     gender = Column(String)
+
+class Book(Base):
+    __tablename__ = 'books'
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    author = Column(String, index=True)
+    year = Column(Integer, index=True)
+    is_published = Column(Boolean, index=True)
+
