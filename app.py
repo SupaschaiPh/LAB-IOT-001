@@ -2,6 +2,7 @@ from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv())
 
 from fastapi import FastAPI, Depends, Response, APIRouter, Body, File , UploadFile
+from fastapi.responses import RedirectResponse
 import models
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,14 +32,19 @@ def get_db():
         db.close()
 
 
-class UserModel(BaseModel):
+class UserModelDTO(BaseModel):
     stu_id: int
     name: str
     lastname: str
     bod: str
     gender: str
 
-#class EditUserModel(BaseModel):
+class MenuSchema(BaseModel):
+    name: str 
+    description: str 
+    price: float 
+
+#class EditUserModelDTO(BaseModel):
 #    stu_id: int | None
 #    name: str | None = None
 #    lastname: str | None = None
@@ -55,6 +61,12 @@ app.add_middleware(
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#crud-utils
 
+
+@app.get("/")
+def redirect_to_docs():
+    return RedirectResponse(url='/docs')
+
+## Book
 
 @router_v1.get('/books')
 async def get_books(db: Session = Depends(get_db)):
@@ -101,6 +113,8 @@ async def delete_book(book_id: int,response: Response, db: Session = Depends(get
     db.commit()
     return {"detail": "Book deleted successfully"}
 
+## USSERRRRRR
+
 @router_v1.get('/users')
 async def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
@@ -112,7 +126,7 @@ async def get_user(stu_id: int, db: Session = Depends(get_db)):
 
 
 @router_v1.post('/users')
-async def create_user(user: Annotated[UserModel, Body()], response: Response, db: Session = Depends(get_db)):
+async def create_user(user: Annotated[UserModelDTO, Body()], response: Response, db: Session = Depends(get_db)):
     # TODO: Add validation
     try:
         newUser = models.User(
@@ -132,7 +146,7 @@ async def create_user(user: Annotated[UserModel, Body()], response: Response, db
         }
 
 @router_v1.patch('/users/{stu_id}')
-async def update_user(stu_id: int,response: Response , user: Annotated[UserModel, Body()], db: Session = Depends(get_db)):
+async def update_user(stu_id: int,response: Response , user: Annotated[UserModelDTO, Body()], db: Session = Depends(get_db)):
     try:
         newUser = models.User(
             stu_id=user.stu_id,
@@ -188,6 +202,39 @@ async def delete_user(stu_id: int , response: Response , db: Session = Depends(g
         "messgage": "delete fail",
         "help":"pls stu_id is have been in database"
     }
+
+
+
+
+
+@router_v1.get('/menus')
+async def get_menus(db: Session = Depends(get_db)):
+    menus = db.query(models.Menu).all()
+    return menus
+@router_v1.get('/menus/{menu_id}')
+async def get_menu(menu_id: int , response: Response, db: Session = Depends(get_db)):
+    menu = db.query(models.Menu).filter(models.Menu.id == menu_id).first()
+    if not menu:
+        response.status_code = 404
+        return {"message": "Menu not found"}
+    return menu
+@router_v1.post('/menus')
+async def create_menu(menu: MenuSchema, db: Session = Depends(get_db)):
+    new_menu = Menu(
+        name=menu.name,
+        description=menu.description,
+        price=menu.price,
+    )
+    db.add(new_menu)
+    db.commit()
+    db.refresh(new_menu)
+    return new_menu
+
+
+
+
+
+
 app.include_router(router_v1)
 
 if __name__ == '__main__':
