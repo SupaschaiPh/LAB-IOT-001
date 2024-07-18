@@ -11,6 +11,8 @@ from database import SessionLocal, engine
 from pydantic import BaseModel,Field
 from typing import Annotated
 
+from typeDTO import UserDTO,BookDTO,MenuDTO
+
 import os
 
 # For Validation
@@ -32,29 +34,7 @@ def get_db():
         db.close()
 
 
-class UserModelDTO(BaseModel):
-    stu_id: int
-    name: str
-    lastname: str
-    bod: str
-    gender: str
-
-class MenuDTO(BaseModel):
-    name: str 
-    description: str  = ""
-    price: float 
-
-class BookDTO(BaseModel):
-    title: str
-    description: str = ""
-    author: str
-    year: int = 2024
-    is_published: bool = True
-    cover_url: str = ""
-    category: str = ""
-    synopsis: str = ""
-
-#class EditUserModelDTO(BaseModel):
+#class EditUserDTO(BaseModel):
 #    stu_id: int | None
 #    name: str | None = None
 #    lastname: str | None = None
@@ -89,7 +69,7 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
 @router_v1.post('/books')
 async def create_book(book:Annotated[BookDTO,Body()], response: Response , db: Session = Depends(get_db)):
     # TODO: Add validation
-    newbook = models.Book(title=book.title, author=book.author, year=book.year, is_published=book.is_published,description=book.description,category=book.category,synopsis=book.synopsis)
+    newbook = models.Book(title=book.title, author=book.author, year=book.year, is_published=book.is_published,description=book.description,category=book.category,synopsis=book.synopsis , cover_url = book.cover_url)
     db.add(newbook)
     db.commit()
     db.refresh(newbook)
@@ -103,7 +83,7 @@ async def update_book(book_id: int, book: Annotated[BookDTO,Body()] ,response: R
         response.status_code = 404
         return {"message": "Book not found"}
 
-    for key, value in book.items():
+    for key, value in book.dict().items():
         setattr(existing_book, key, value)
 
     db.commit()
@@ -134,7 +114,7 @@ async def get_user(stu_id: int, db: Session = Depends(get_db)):
 
 
 @router_v1.post('/users')
-async def create_user(user: Annotated[UserModelDTO, Body()], response: Response, db: Session = Depends(get_db)):
+async def create_user(user: Annotated[UserDTO, Body()], response: Response, db: Session = Depends(get_db)):
     # TODO: Add validation
     try:
         newUser = models.User(
@@ -154,7 +134,7 @@ async def create_user(user: Annotated[UserModelDTO, Body()], response: Response,
         }
 
 @router_v1.patch('/users/{stu_id}')
-async def update_user(stu_id: int,response: Response , user: Annotated[UserModelDTO, Body()], db: Session = Depends(get_db)):
+async def update_user(stu_id: int,response: Response , user: Annotated[UserDTO, Body()], db: Session = Depends(get_db)):
     try:
         #existing_user = models.User(
         #    stu_id=user.stu_id,
@@ -163,7 +143,7 @@ async def update_user(stu_id: int,response: Response , user: Annotated[UserModel
         if not existing_user:
             response.status_code = 404
             return {"message": "Book not found"}
-        for key, value in user.items():
+        for key, value in user.dict().items():
             setattr(existing_user, key, value)
         db.commit()
         db.refresh(existing_user)
