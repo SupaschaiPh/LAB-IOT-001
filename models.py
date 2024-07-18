@@ -1,4 +1,4 @@
-from sqlalchemy import  Column, Integer, String ,Date,Boolean
+from sqlalchemy import  Column, Integer, String ,Date,Boolean , Float
 # from sqlalchemy.orm import relationship
 
 from database import Base
@@ -12,6 +12,7 @@ class User(Base):
     bod = Column(Date)
     gender = Column(String)
 
+
 class Book(Base):
     __tablename__ = 'books'
 
@@ -20,4 +21,16 @@ class Book(Base):
     author = Column(String, index=True)
     year = Column(Integer, index=True)
     is_published = Column(Boolean, index=True)
+    cover_url = Column(String)
+    category = Column(String)  # New field for book category
+    description = Column(String)  # New field for book description
+    synopsis = Column(String) 
 
+
+class Menu(Base):
+    __tablename__ = 'menu'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    price = Column(Float, nullable=False)

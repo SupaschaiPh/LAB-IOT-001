@@ -1,7 +1,7 @@
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv())
 
-from fastapi import FastAPI, Depends, Response, APIRouter, Body
+from fastapi import FastAPI, Depends, Response, APIRouter, Body, File , UploadFile
 import models
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,9 +65,11 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
     return db.query(models.Book).filter(models.Book.id == book_id).first()
 
 @router_v1.post('/books')
-async def create_book(book: dict, response: Response, db: Session = Depends(get_db)):
+async def create_book(book: dict, response: Response, cover: UploadFile , db: Session = Depends(get_db)):
+    if cover :
+        print(cover.filename)
     # TODO: Add validation
-    newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'])
+    newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'],description=book['description'],category=book['category'],synopsis=book['synopsis'])
     db.add(newbook)
     db.commit()
     db.refresh(newbook)
