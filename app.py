@@ -77,9 +77,7 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
     return db.query(models.Book).filter(models.Book.id == book_id).first()
 
 @router_v1.post('/books')
-async def create_book(book: dict, response: Response, cover: UploadFile , db: Session = Depends(get_db)):
-    if cover :
-        print(cover.filename)
+async def create_book(book: dict, response: Response , db: Session = Depends(get_db)):
     # TODO: Add validation
     newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'],description=book['description'],category=book['category'],synopsis=book['synopsis'])
     db.add(newbook)
@@ -220,7 +218,7 @@ async def get_menu(menu_id: int , response: Response, db: Session = Depends(get_
     return menu
 @router_v1.post('/menus')
 async def create_menu(menu: MenuSchema, db: Session = Depends(get_db)):
-    new_menu = Menu(
+    new_menu = models.Menu(
         name=menu.name,
         description=menu.description,
         price=menu.price,
