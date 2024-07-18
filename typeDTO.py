@@ -1,12 +1,21 @@
 from pydantic import BaseModel
 from typing import List
+import datetime
+
 
 class UserDTO(BaseModel):
     stu_id: int
     name: str
     lastname: str
-    bod: str
+    bod: datetime.date|datetime.datetime
     gender: str
+
+class UserEditDTO(BaseModel):
+    stu_id: int|None = None
+    name: str|None = None
+    lastname: str|None = None
+    bod: datetime.date|datetime.datetime|None = None
+    gender: str|None = None
 
 class MenuDTO(BaseModel):
     name: str 
@@ -22,6 +31,16 @@ class BookDTO(BaseModel):
     cover_url: str = ""
     category: str = ""
     synopsis: str = ""
+
+class BookEditDTO(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    author: str | None = None
+    year: int | None = None
+    is_published: bool | None = None
+    cover_url: str | None = None
+    category: str | None = None
+    synopsis: str | None = None
 
 class OrderItemDTO(BaseModel):
     menu_id: int
