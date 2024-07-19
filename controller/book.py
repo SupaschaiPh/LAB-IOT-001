@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from typeDTO import BookDTO,BookEditDTO
 
-from typing import Annotated,List
+from typing import Annotated
 
 router_v1 = APIRouter(prefix='/api/v1')
 

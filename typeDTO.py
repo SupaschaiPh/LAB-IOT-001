@@ -19,6 +19,7 @@ class UserEditDTO(BaseModel):
 
 class MenuDTO(BaseModel):
     name: str 
+    cover_url: str = ""
     description: str  = ""
     price: float 
 
@@ -46,7 +47,7 @@ class OrderItemDTO(BaseModel):
     menu_id: int
     quantity: int
 
-class OrderCreateDTO(BaseModel):
+class OrderDTO(BaseModel):
     order_items: List[OrderItemDTO]
 
 class OrderResponseDTO(BaseModel):
