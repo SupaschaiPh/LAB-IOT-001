@@ -28,6 +28,7 @@ async def create_menu(menu: Annotated[MenuDTO,Body()], db: Session = Depends(get
         name=menu.name,
         description=menu.description,
         price=menu.price,
+        cover_url=menu.cover_url,
     )
     db.add(new_menu)
     db.commit()

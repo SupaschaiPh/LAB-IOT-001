@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import List
 import datetime
 
@@ -19,7 +19,7 @@ class UserEditDTO(BaseModel):
 
 class MenuDTO(BaseModel):
     name: str 
-    cover_url: str = ""
+    cover_url: str|None = None
     description: str  = ""
     price: float 
 
@@ -48,7 +48,7 @@ class OrderItemDTO(BaseModel):
     quantity: int
 
 class OrderDTO(BaseModel):
-    order_items: List[OrderItemDTO]
+    order_items: List[OrderItemDTO] = Field(min_items=1)
 
 class OrderResponseDTO(BaseModel):
     id: int
