@@ -30,7 +30,7 @@ class Book(Base):
     author = Column(String, index=True)
     year = Column(Integer, index=True)
     is_published = Column(Boolean, index=True)
-    cover_url = Column(String)
+    cover_url = Column(String, nullable=True , default=None)
     category = Column(String)  # New field for book category
     description = Column(String)  # New field for book description
     synopsis = Column(String) 
@@ -43,7 +43,7 @@ class Menu(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float, nullable=False)
-    cover_url = Column(String)
+    cover_url = Column(String , nullable=True , default=None)
 
 
 class Order(Base):
