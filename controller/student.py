@@ -10,7 +10,7 @@ from typing import Annotated
 
 
 ## USSERRRRRR
-router_v1 = APIRouter(prefix='/api/v1/student')
+router_v1 = APIRouter(prefix='/api/v1/students')
 
 @router_v1.get('/')
 async def get_users(db: Session = Depends(get_db)):
