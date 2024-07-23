@@ -54,7 +54,7 @@ async def update_order(order_id: int, order_data: Annotated[OrderDTO,Body()] ,re
     order.total_price = sum(item.quantity * menu.price for item in order_data.order_items for menu in db.query(Menu).filter_by(id=item.menu_id))
 
     for item in order_data.order_items:
-        order_item = db.query(OrderItem).filter(OrderItem.id == item.id).first()
+        order_item = db.query(OrderItem).filter(OrderItem.order_id == order_id and OrderItem.menu_id == item.menu_id).first()
         if order_item:
             menu = db.query(Menu).filter(Menu.id == item.menu_id).first()
             order_item.quantity = item.quantity

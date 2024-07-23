@@ -44,7 +44,7 @@ class BookEditDTO(BaseModel):
     synopsis: str | None = None
 
 class OrderItemDTO(BaseModel):
-    menu_id: int
+    menu_id: int 
     quantity: int
 
 class OrderDTO(BaseModel):

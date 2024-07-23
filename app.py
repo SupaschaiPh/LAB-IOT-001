@@ -22,7 +22,6 @@ import os
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-router_v1 = APIRouter(prefix='/api/v1')
 
 
 app.add_middleware(
@@ -44,11 +43,6 @@ def redirect_to_docs():
 
 
 
-
-
-
-
-app.include_router(router_v1)
 app.include_router(student.router_v1)
 app.include_router(book.router_v1)
 app.include_router(menu.router_v1)
