@@ -53,6 +53,7 @@ class Order(Base):
     total_price = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now(tz=bkk_timezone))
     updated_at = Column(DateTime,default=datetime.datetime.now(tz=bkk_timezone), onupdate=datetime.datetime.now(tz=bkk_timezone))
+    note = Column(String,default=None, nullable=True)
     order_items:Mapped[List["OrderItem"]]  = relationship(back_populates="order",lazy='joined', cascade="all, delete")
     #order_items:Mapped["OrderItem"] = relationship("OrderItem", back_populates="order_id")
 

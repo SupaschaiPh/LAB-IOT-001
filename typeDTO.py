@@ -49,6 +49,7 @@ class OrderItemDTO(BaseModel):
 
 class OrderDTO(BaseModel):
     order_items: List[OrderItemDTO] = Field(min_items=1)
+    note:str|None = None
 
 class OrderResponseDTO(BaseModel):
     id: int
