@@ -67,4 +67,4 @@ class OrderItem(Base):
     price = Column(Float, nullable=False)
 
     order: Mapped["Order"] = relationship("Order", back_populates="order_items" , cascade="all, delete")
-    menu : Mapped["Menu"]= relationship("Menu", backref="order_items",lazy='joined' , cascade="all, delete")
+    menu : Mapped["Menu"]= relationship("Menu", backref="order_items",lazy='joined')
