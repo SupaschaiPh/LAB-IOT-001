@@ -20,7 +20,7 @@ async def get_all_orders(db: Session = Depends(get_db)):
 @router_v1.post("/orders")
 async def create_order(order_data: Annotated[OrderDTO,Body()] , db: Session = Depends(get_db)):
     total_price = sum(item.quantity * menu.price for item in order_data.order_items for menu in db.query(Menu).filter_by(id=item.menu_id))
-    order = Order(total_price=total_price)
+    order = Order(total_price=total_price,note=order_data.note)
     db.add(order)
     db.commit()
     db.refresh(order)
@@ -50,7 +50,8 @@ async def update_order(order_id: int, order_data: Annotated[OrderDTO,Body()] ,re
     if not order:
         response.status_code = 404
         return {"message": "Order not found"}
-
+    if "note" in order_data.dict(exclude_unset=True):
+        order.note = order_data.note
     order.total_price = sum(item.quantity * menu.price for item in order_data.order_items for menu in db.query(Menu).filter_by(id=item.menu_id))
 
     for item in order_data.order_items:
